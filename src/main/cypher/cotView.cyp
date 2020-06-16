@@ -9,18 +9,14 @@ CREATE (benj_pasek:Party {name: 'Benj Pasek'})
 CREATE (kobalt_us:Party {name: 'Kobalt US'})
 CREATE (amra:Party {name: 'AMRA'})
 CREATE (kobalt_uk:Party {name: 'Kobalt UK'})
-
 CREATE (kmg:Group {name: 'KMG'})
-
 CREATE (bears_den:Prospect {name: 'Bears Den'})
-
 CREATE (deal_1:Deal {name: 'Deal 1'})
-
 CREATE (contract_1:Contract {name: 'Contract 1'})
-
-CREATE (account_1:Account {name: 'Acc 1'})
-CREATE (account_2:Account {name: 'Acc 2'})
-CREATE (account_3:Account {name: 'Acc 3'})
+CREATE (statement_1:Statement {name: 'Bears Den Statement', currentBalance:-5000})
+CREATE (account_1:Account {name: 'Acc 1', balance: 9000})
+CREATE (account_2:Account {name: 'Acc 2', balance: 4000})
+CREATE (account_3:Account {name: 'Acc 3', balance: 2000})
 CREATE (account_4:Account {name: 'Acc 4'})
 CREATE (account_5:Account {name: 'Acc 5'})
 CREATE (account_6:Account {name: 'Acc 6'})
@@ -28,7 +24,6 @@ CREATE (account_7:Account {name: 'Acc 7'})
 CREATE (account_8:Account {name: 'Acc 8'})
 CREATE (account_9:Account {name: 'Acc 9'})
 CREATE (account_10:Account {name: 'Acc 10'})
-
 CREATE (bears_den)-[:deal_prospect]->(deal_1)
 CREATE (allison)-[:is_dealmaker]->(deal_1)
 CREATE (deal_1)-[:is_documented_in]->(contract_1)
@@ -47,30 +42,32 @@ CREATE (kobalt_us)-[:is_assignor]->(account_7)
 CREATE (kobalt_us)-[:is_assignor]->(account_8)
 CREATE (kobalt_us)-[:is_assignor]->(account_9)
 CREATE (kobalt_uk)-[:is_assignor]->(account_10)
-
-
 CREATE (kobalt_uk)-[:is_acquirer]->(account_1)
 CREATE (kobalt_uk)-[:is_acquirer]->(account_2)
 CREATE (kobalt_uk)-[:is_acquirer]->(account_3)
-
 CREATE (kobalt_us)-[:is_acquirer]->(account_4)
 CREATE (kobalt_us)-[:is_acquirer]->(account_5)
 CREATE (kobalt_us)-[:is_acquirer]->(account_6)
-
 CREATE (amra)-[:is_acquirer]->(account_7)
 CREATE (amra)-[:is_acquirer]->(account_8)
 CREATE (amra)-[:is_acquirer]->(account_9)
 CREATE (amra)-[:is_acquirer]->(account_10)
-
 CREATE (amra)-[:is_subsidiary]->(kmg)
 CREATE (kobalt_us)-[:is_subsidiary]->(kmg)
 CREATE (kobalt_uk)-[:is_subsidiary]->(kmg)
+CREATE (statement_1)-[:enforced_by]->(contract_1)
 
 
 MATCH p=(allison:Party)-[:is_dealmaker]->(:Deal)-[:is_documented_in]->(:Contract)<-[:is_managed_by]-(:Account)<-[:is_acquirer]-(party:Party)-[:is_subsidiary]->(group:Group)
   WHERE allison.name='Allison'
 RETURN DISTINCT group.name, party.name
 
+MATCH p=(s:Statement)--(c:Contract)<-[:is_admin_owner]-(admin:Party)
+RETURN DISTINCT s.name, admin.name, s.currentBalance
+
+MATCH p=(s:Statement)--(c:Contract)<-[:is_managed_by]-(acc:Account)
+  WHERE s.name='Bears Den Statement'
+RETURN DISTINCT acc.name, acc.balance
 
 
 MATCH (n)
