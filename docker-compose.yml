@@ -7,3 +7,4 @@ services:
     - "7687:7687"
     volumes:
     - "./data:/data"
+    - "./export-v2.csv:/var/lib/neo4j/import/export.csv"
